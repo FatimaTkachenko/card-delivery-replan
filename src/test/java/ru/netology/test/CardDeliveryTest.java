@@ -1,7 +1,6 @@
 package ru.netology.test;
 
 import com.codeborne.selenide.Configuration;
-import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +12,12 @@ public class CardDeliveryTest {
 
     @BeforeAll
     static void setUpAll() {
-        WebDriverManager.chromedriver().setup();
+        // В CI используем системный ChromeDriver
+        // В Windows используем WebDriverManager (если нужно)
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.contains("windows")) {
+            io.github.bonigarcia.wdm.WebDriverManager.chromedriver().setup();
+        }
         Configuration.browser = "chrome";
         Configuration.headless = false;
         Configuration.timeout = 10000;
@@ -22,43 +26,32 @@ public class CardDeliveryTest {
 
     @Test
     void shouldReplanMeeting() {
-        // Генерируем данные для первого пользователя
         DataGenerator.UserInfo firstUser = DataGenerator.generateValidUser();
 
-        // Открываем страницу
         open("http://localhost:9999");
 
-        // Заполняем форму
         $("[data-test-id='city'] input").setValue(firstUser.getCity());
         $("[data-test-id='date'] input").doubleClick().sendKeys(firstUser.getDate());
         $("[data-test-id='name'] input").setValue(firstUser.getName());
         $("[data-test-id='phone'] input").setValue(firstUser.getPhone());
         $("[data-test-id='agreement'] .checkbox__box").click();
 
-        // Нажимаем "Запланировать"
         $("button").click();
 
-        // Проверяем, что встреча успешно запланирована
         $("[data-test-id='success-notification']").shouldBe(visible)
                 .shouldHave(text("Встреча успешно запланирована"));
 
-        // Генерируем НОВУЮ ДАТУ (через 5 дней) — это ключевое отличие!
         DataGenerator.UserInfo secondUser = DataGenerator.generateUserWithNewDate();
 
-        // Меняем только дату
         $("[data-test-id='date'] input").doubleClick().sendKeys(secondUser.getDate());
 
-        // Нажимаем "Запланировать" снова
         $("button").click();
 
-        // Проверяем, что появилось предложение перепланировать
         $("[data-test-id='replan-notification']").shouldBe(visible)
                 .shouldHave(text("У вас уже запланирована встреча на другую дату. Перепланировать?"));
 
-        // Нажимаем "Перепланировать"
         $("[data-test-id='replan-notification'] button").click();
 
-        // Проверяем, что встреча перепланирована
         $("[data-test-id='success-notification']").shouldBe(visible)
                 .shouldHave(text("Встреча успешно перепланирована"));
     }
