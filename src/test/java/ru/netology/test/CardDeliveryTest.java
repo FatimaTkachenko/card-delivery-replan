@@ -12,6 +12,11 @@ public class CardDeliveryTest {
 
     @BeforeAll
     static void setUpAll() {
+        // Автоматически определяем ОС и настраиваем драйвер
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.contains("linux")) {
+            System.setProperty("webdriver.chrome.driver", "/usr/bin/google-chrome");
+        }
         Configuration.browser = "chrome";
         Configuration.headless = true;
         Configuration.timeout = 10000;
