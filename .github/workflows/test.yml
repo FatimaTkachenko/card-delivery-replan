@@ -24,4 +24,18 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run tests with Selenide headless
-        run: ./gradlew test -Dselenide.headless=true
+        run: ./gradlew test -Dselenide.headless=true --info
+
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: build/reports/tests/test
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: build/reports/tests
