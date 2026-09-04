@@ -47,13 +47,12 @@ public class DataGenerator {
         );
     }
 
-    // Новый метод для генерации пользователя с другой датой
     public static UserInfo generateUserWithNewDate() {
         return new UserInfo(
                 generateCity(),
                 generateName(),
                 generatePhone(),
-                generateDate(7)  // меняем дату на +7 дней
+                generateDate(7)
         );
     }
 }

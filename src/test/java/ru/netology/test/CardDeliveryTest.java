@@ -12,11 +12,6 @@ public class CardDeliveryTest {
 
     @BeforeAll
     static void setUpAll() {
-        // Для CI указываем путь к Chrome
-        String os = System.getProperty("os.name").toLowerCase();
-        if (os.contains("linux")) {
-            System.setProperty("webdriver.chrome.driver", "/usr/bin/google-chrome");
-        }
         Configuration.browser = "chrome";
         Configuration.headless = true;
         Configuration.timeout = 10000;
