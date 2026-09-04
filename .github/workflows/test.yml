@@ -1,54 +1,27 @@
-import com.codeborne.selenide.Configuration;
-import com.codeborne.selenide.Selenide;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+name: Java CI with Gradle
 
-import static com.codeborne.selenide.Selenide.$;
-import static com.codeborne.selenide.Selenide.open;
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
 
-class CardDeliveryTest {
+jobs:
+  test:
+    runs-on: ubuntu-latest
 
-    @BeforeAll
-    static void setUp() {
-        // Браузер и режим
-        Configuration.browser = "chrome";
-        Configuration.headless = true; // эквивалент -Dselenide.headless=true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-        // Опции Chrome для CI (Linux, Docker, GitHub Actions)
-        Configuration.browserCapabilities = new org.openqa.selenium.chrome.ChromeOptions()
-            .addArguments("--headless=new")
-            .addArguments("--no-sandbox")
-            .addArguments("--disable-dev-shm-usage")
-            .addArguments("--disable-gpu");
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
 
-        // Таймауты (опционально, под свой проект)
-        Configuration.timeout = 10000;        // общий таймаут
-        Configuration.pageLoadTimeout = 30000;  // загрузка страницы
-    }
+      - name: Grant execute permission for Gradle
+        run: chmod +x gradlew
 
-    @AfterEach
-    void tearDown() {
-        Selenide.closeWebDriver();
-    }
-
-    @Test
-    void shouldReplanMeeting() {
-        // Замени URL на свой
-        open("https://your-app-url.example.com");
-
-        // Пример шагов теста (адаптируй под свой UI)
-        // 1. Открыть карточку доставки
-        // 2. Нажать "Перенести встречу"
-        // 3. Выбрать новую дату/время
-        // 4. Сохранить
-        // 5. Проверить, что встреча перенесена
-
-        // Пример (псевдокод, подставь свои селекторы):
-        // $(".card-delivery-item").click();
-        // $("#replan-meeting-button").click();
-        // $("#new-date-input").setValue("05.09.2026");
-        // $("#save-button").click();
-        // $(".meeting-status").shouldHave(text("Перенесено"));
-    }
-}
+      - name: Run tests with Selenide headless
+        run: ./gradlew test -Dselenide.headless=true
