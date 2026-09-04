@@ -12,14 +12,8 @@ public class CardDeliveryTest {
 
     @BeforeAll
     static void setUpAll() {
-        // В CI используем системный ChromeDriver
-        // В Windows используем WebDriverManager (если нужно)
-        String os = System.getProperty("os.name").toLowerCase();
-        if (os.contains("windows")) {
-            io.github.bonigarcia.wdm.WebDriverManager.chromedriver().setup();
-        }
         Configuration.browser = "chrome";
-        Configuration.headless = false;
+        Configuration.headless = true;  // Включаем headless для CI
         Configuration.timeout = 10000;
         Configuration.browserSize = "1920x1080";
     }
