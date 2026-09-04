@@ -1,55 +1,54 @@
-name: Java CI with Gradle
+import com.codeborne.selenide.Configuration;
+import com.codeborne.selenide.Selenide;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+import static com.codeborne.selenide.Selenide.$;
+import static com.codeborne.selenide.Selenide.open;
 
-permissions:
-  contents: read
+class CardDeliveryTest {
 
-jobs:
-  build:
+    @BeforeAll
+    static void setUp() {
+        // Браузер и режим
+        Configuration.browser = "chrome";
+        Configuration.headless = true; // эквивалент -Dselenide.headless=true
 
-    runs-on: ubuntu-latest
+        // Опции Chrome для CI (Linux, Docker, GitHub Actions)
+        Configuration.browserCapabilities = new org.openqa.selenium.chrome.ChromeOptions()
+            .addArguments("--headless=new")
+            .addArguments("--no-sandbox")
+            .addArguments("--disable-dev-shm-usage")
+            .addArguments("--disable-gpu");
 
-    steps:
-    - uses: actions/checkout@v4
+        // Таймауты (опционально, под свой проект)
+        Configuration.timeout = 10000;        // общий таймаут
+        Configuration.pageLoadTimeout = 30000;  // загрузка страницы
+    }
 
-    - name: Set up JDK 11
-      uses: actions/setup-java@v4
-      with:
-        java-version: '11'
-        distribution: 'temurin'
+    @AfterEach
+    void tearDown() {
+        Selenide.closeWebDriver();
+    }
 
-    - name: Install Chrome and ChromeDriver
-      run: |
-        # Устанавливаем переменную с последней стабильной версией
-        CHROME_VERSION=$(curl -s https://googlechromelabs.github.io/chrome-for-testing/LATEST_RELEASE_STABLE)
-        echo "Using Chrome version: $CHROME_VERSION"
-        
-        # Скачиваем Chrome
-        wget -q "https://storage.googleapis.com/chrome-for-testing-public/$CHROME_VERSION/linux64/chrome-linux64.zip"
-        # Скачиваем ChromeDriver
-        wget -q "https://storage.googleapis.com/chrome-for-testing-public/$CHROME_VERSION/linux64/chromedriver-linux64.zip"
-        
-        # Распаковываем
-        unzip -q chrome-linux64.zip
-        unzip -q chromedriver-linux64.zip
-        
-        # Устанавливаем
-        sudo mv chrome-linux64 /opt/chrome
-        sudo mv chromedriver-linux64/chromedriver /usr/local/bin/
-        sudo chmod +x /usr/local/bin/chromedriver
-        sudo ln -s /opt/chrome/chrome /usr/local/bin/google-chrome
-        
-        # Проверяем версии
-        echo "Chrome version: $(google-chrome --version)"
-        echo "ChromeDriver version: $(chromedriver --version)"
+    @Test
+    void shouldReplanMeeting() {
+        // Замени URL на свой
+        open("https://your-app-url.example.com");
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
+        // Пример шагов теста (адаптируй под свой UI)
+        // 1. Открыть карточку доставки
+        // 2. Нажать "Перенести встречу"
+        // 3. Выбрать новую дату/время
+        // 4. Сохранить
+        // 5. Проверить, что встреча перенесена
 
-    - name: Run tests with Gradle
-      run: ./gradlew test -Dselenide.headless=true
+        // Пример (псевдокод, подставь свои селекторы):
+        // $(".card-delivery-item").click();
+        // $("#replan-meeting-button").click();
+        // $("#new-date-input").setValue("05.09.2026");
+        // $("#save-button").click();
+        // $(".meeting-status").shouldHave(text("Перенесено"));
+    }
+}
