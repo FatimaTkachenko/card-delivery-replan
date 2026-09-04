@@ -10,8 +10,10 @@ class CardDeliveryTest {
 
     @BeforeAll
     static void setUp() {
-        Configuration.browser = "chrome";
+        // Используем Firefox вместо Chrome
+        Configuration.browser = "firefox";
         Configuration.headless = true;
+
         Configuration.timeout = 15000;
         Configuration.pageLoadTimeout = 30000;
     }
@@ -26,7 +28,7 @@ class CardDeliveryTest {
         // Замени URL на свой
         open("https://your-app-url.example.com");
 
-        // Тут реальные шаги теста:
+        // Реальные шаги теста:
         // open(...);
         // $(...).click();
         // $(...).setValue(...);
